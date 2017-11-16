@@ -29,6 +29,8 @@ hostfilepath="/etc/hosts_finance"
 #read ips from hosts file
 ips=`cat $hostfilepath | grep $host`
 
+#Todo: using regex to valid ips
+
 #if no host find in the file,return
 if [ ! -n "$ips" ]
 then
