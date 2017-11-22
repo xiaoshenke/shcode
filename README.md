@@ -6,4 +6,4 @@ ssh use /etc/hosts file to transform host to real ip,but when we have multi remo
 you can then user alias command to alia this sh to let'ssay ssh2 for easy using.
 
 #### vimc                         
-vim with line number.
+vim with line number specified.
