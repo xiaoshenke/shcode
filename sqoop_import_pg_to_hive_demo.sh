@@ -1,7 +1,4 @@
 #!/bin/bash
-sqoop import --connect jdbc:postgresql://xxxxx --username xxx --password xxx --hive-import --table aaa.bbb  --where 'limit 2'  --hive-table test.xxx -m 1 --driver org.postgresql.Driver --create-hive-table
 
-
-
-
+sqoop import --connect jdbc:postgresql://xxxyyyyy --hcatalog-database aaa --hcatalog-table bbb -m 1 --hive-overwrite --username xxxx --password yyyyy --table aaa.bbb --driver org.postgresql.Driver 
 
