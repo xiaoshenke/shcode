@@ -1,5 +1,11 @@
 #!/bin/bash
-#Usage: zhihu_img.sh inputURL for eg. zhihu_img.sh https://zhuanlan.zhihu.com/p/19902052
+#Usage: zhihu_img.sh fromURL for eg. zhihu_img.sh https://zhuanlan.zhihu.com/p/19902052
+
+if [ $# -ne 1 ] 
+then
+	echo Usage:./zhihu_img.sh fromURL
+	exit 2
+fi
 
 curl -s -o tmp.html $1 > /dev/null
 
