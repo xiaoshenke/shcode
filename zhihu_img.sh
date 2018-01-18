@@ -1,6 +1,8 @@
 #!/bin/bash
 #Usage: zhihu_img.sh fromURL for eg. zhihu_img.sh https://zhuanlan.zhihu.com/p/19902052
 
+#Todo: not download all images,filter duplicate images
+
 if [ $# -ne 1 ] 
 then
 	echo Usage:./zhihu_img.sh fromURL
@@ -9,12 +11,12 @@ fi
 
 curl -s -o tmp.html $1 > /dev/null
 
-urls=`gawk 'BEGIN{RS=";"} /http:[0-9picFu\\\]*.zhimg.com/{print $0}' tmp.html`
+urls=`gawk 'BEGIN{RS=";"} /https?:[0-9picFu\\\]*.zhimg.com/{print $0}' tmp.html`
 
 for url in $urls:
 do
 #	new_url=${url[@]//u002F//} `echo $url | sed 's!u002F!/!g'` --> Fixme: slash and backslash replacement....
-
+	#echo origin url: $url
 	new_url=$url
 	new_url=${new_url%\\\&quot*}
 	new_url=${new_url##*com\\u002F}	
