@@ -3,6 +3,26 @@
 
 #Todo: not download all images,filter duplicate images
 
+# 0:success 1:false
+# those url which ends with "_r.jpg" is valid
+function is_valid_url {
+	if [ $# -ne 1 ]
+	then 
+		return 1
+	fi
+	name=$1
+	#get rid of .jpg
+	name=${name%%.jpg*}
+
+	#get last 2 chars	
+	if [[ ${name:0-2:2} == "_r" ]]
+	then 
+		return 0
+	else
+		return 1
+	fi
+}
+
 if [ $# -ne 1 ] 
 then
 	echo Usage:./zhihu_img.sh fromURL
@@ -20,8 +40,15 @@ do
 	new_url=$url
 	new_url=${new_url%\\\&quot*}
 	new_url=${new_url##*com\\u002F}	
-	new_url="http://pic4.zhimg.com/"$new_url
 
+	is_valid_url $new_url
+	if [ $? -ne 0 ]
+	then
+		echo $new_url not valid,continue
+		continue
+	fi
+
+	new_url="http://pic4.zhimg.com/"$new_url
 	echo begin to download: $new_url
 
 	savefile=${new_url:0-15:15}
