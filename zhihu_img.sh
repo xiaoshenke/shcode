@@ -19,7 +19,33 @@ function is_valid_url {
 	fi
 }
 
-# init open_image flag ->  0:not open 1:open
+
+images=( )
+# use Array:images to filter duplicate urls 0:success 1:false
+function should_download {
+	if [ $# -ne 1 ]
+	then
+		echo $[ 1 ]
+	fi
+	local find=0
+	input_image=$1
+	for value in ${images[*]}
+	do
+		if [[ ${value:0:10} == ${input_image:0:10} ]]
+		then
+			find=1
+			break
+		fi
+	done
+	if [ $find -eq 1 ]
+	then
+		echo $[ 1 ]
+	else
+		echo $[ 0 ]
+	fi
+}
+
+# init open_image flag which dertimines whether open image after success download it ->  0:not open 1:open
 open_image=0
 while [ -n "$1" ]
 do
@@ -32,18 +58,25 @@ do
 	shift
 done 
 
+# check params
 if [ $# -ne 1 ] 
 then
 	echo Usage:./zhihu_img.sh [-o -open] fromURL
 	exit 2
 fi
 
+# extract all urls
 curl -s -o tmp.html $1 > /dev/null
-
-urls=`gawk 'BEGIN{RS=";"} /https?:[0-9picFu\\\]*.zhimg.com/{print $0}' tmp.html`
+gawk 'BEGIN{RS=";"} {print $0}' tmp.html > tmp1.html
+start=`sed -n '/uthorName&/=' tmp1.html`
+end=`sed -n '/new Date/=' tmp1.html`
+duration=$[end-start]
+cat tmp1.html |tail -n +$start|head -n $duration > tmp2.html
+urls=`gawk '/https?:[0-9picFu\\\]*.zhimg.com/{print $0}' tmp2.html`
 
 for url in $urls:
 do
+# dealing with each url
 #	new_url=${url[@]//u002F//} `echo $url | sed 's!u002F!/!g'` --> Fixme: slash and backslash replacement....
 	new_url=$url
 	new_url=${new_url%\\\&quot*}
@@ -55,6 +88,15 @@ do
 		#echo $new_url not valid,continue
 		continue
 	fi
+	
+	should_d=`should_download $new_url`
+	if [ $should_d -eq 1 ]
+	then
+		#we have alread download it 
+		continue
+	fi
+	index=${#images[@]}
+	images[ $index ]=$new_url
 
 	new_url="http://pic4.zhimg.com/"$new_url
 	echo begin to download: $new_url
@@ -63,9 +105,10 @@ do
 	curl -s -o $savefile $new_url > /dev/null 2>&1
 	if [ $open_image -eq 1  ]
 	then
-		#echo open -a Preview $savefile
 		open -a Preview $savefile
 	fi
 done
 
 rm -f tmp.html
+rm -f tmp1.html
+rm -f tmp2.html
