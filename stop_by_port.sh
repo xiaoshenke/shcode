@@ -21,7 +21,7 @@ while [ $COUNT -lt 1 ]; do
     sleep 1
     COUNT=1
     for PID in $PIDS ; do
-        PID_EXIST=`ps -f -p $PID `
+        PID_EXIST=`ps -f -p $PID | grep $PID `
         if [ -n "$PID_EXIST" ]; then
             COUNT=0
             break
