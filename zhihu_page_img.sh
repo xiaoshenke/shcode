@@ -1,6 +1,12 @@
 #!/bin/bash
-
 # test URL:https://zhuanlan.zhihu.com/p/33344222?utm_campaign=rss&utm_medium=rss&utm_source=rss&utm_content=title
+
+# check params
+if [ $# -ne 1 ] 
+then
+	echo Usage:./zhihu_pape_img.sh http-url
+	exit 2
+fi
 
 . zhihu_img_util.sh 
 
@@ -34,7 +40,6 @@ do
 	urls[ $index ]=$url
 	rm -f tmp_line
 done
-echo ${urls[*]}
 
 index=$[ 0 ]
 lenth=${#urls[@]}
@@ -45,15 +50,19 @@ do
 	url=${urls[ $index ]}
 	# replace origin <img src=xxx> with http:// of every position of <img>s
 	# but because http:// has many special charactors,we cannot simply use sed 'c'  we have do some ugly things... p304
-	# TODO: sed 'r' p304
-	
+	echo $url > tmp_url
+	sed "$line d" tmp2.html > tmp2
+	sed "$line r tmp_url" tmp2 > tmp2.html	
 	index=$[index + 1]
-	break
+	rm -f tmp_url
+	rm -f tmp2
 done
 
-#rm -f tmp.html
-#rm -f tmp1.html
-#rm -f tmp2.html
+cat tmp2.html
+
+rm -f tmp.html
+rm -f tmp1.html
+rm -f tmp2.html
 
 
 # extract html urls
