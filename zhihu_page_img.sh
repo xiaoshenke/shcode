@@ -12,16 +12,17 @@ fi
 
 curl -s -o tmp.html $1 > /dev/null
 
+# find useful content positions,we will only extract content in [start,end]
 start=`sed -n '/PostIndex-title/=' tmp.html`
 end=`sed -n '/PostIndex-footer/=' tmp.html`
 duration=$[end-start+1]
 
-# get text and img html
+# extract text and <image src="http://xxxx"> from origin html file
 cat tmp.html |tail -n +$start|head -n $duration | gawk 'BEGIN{RS="abcdefgfedcba";FS="<div class=\"PostIndex-footer"} {print $1}' > tmp1.html
 cat tmp1.html| gawk 'BEGIN{RS="<p>|</p>|</title>|<b>|<code class=\"language-text\">"} {print $0}' | sed '/img src/!s/<[^>]*>//g' > tmp2.html
 
 
-# get html line numbers
+# find line numbers of all image positions,we will replace urls using these line numbers
 ori_lines=`cat tmp2.html |sed -n '/img src/='`
 lines=( )
 for line in $ori_lines
@@ -30,7 +31,7 @@ do
 	lines[ $index ]=$line
 done
 
-# get urls from html
+# find all image http-urls from html
 urls=( )
 for line in $ori_lines
 do
@@ -41,25 +42,24 @@ do
 	rm -f tmp_line
 done
 
+# replace http-urls using line numbers
 index=$[ 0 ]
 lenth=${#urls[@]}
-
 while [ $index -lt $lenth ]
 do
 	line=${lines[ $index ]}
 	url=${urls[ $index ]}
-	# replace origin <img src=xxx> with http:// of every position of <img>s
-	# but because http:// has many special charactors,we cannot simply use sed 'c'  we have do some ugly things... p304
-	echo $url > tmp_url
-	sed "$line d" tmp2.html > tmp2
-	sed "$line r tmp_url" tmp2 > tmp2.html	
+	# sed 'c\' -> replace command
+	sed "$line c\\
+$url
+" tmp2.html > tmp3.html
+	cat tmp3.html > tmp2.html
 	index=$[index + 1]
-	rm -f tmp_url
-	rm -f tmp2
 done
 
 cat tmp2.html
 
+rm -f tmp3.html
 rm -f tmp.html
 rm -f tmp1.html
 rm -f tmp2.html
@@ -70,5 +70,3 @@ rm -f tmp2.html
 #urls=`cat tmp_urls`
 #clean_urls=`return_valid_urls ${urls[*]}`
 #echo ${clean_urls[*]}
-
-
