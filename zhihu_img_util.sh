@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# currently only support .jpg
+# function: list all all .jpg images under dir
 function list_images {
 	local dir=""
 	if [ -n "$1" ]
@@ -12,6 +12,19 @@ function list_images {
 	fi
 	list=`find $dir -name *[.]jpg`
 	echo ${list[@]}
+}
+
+function find_big_image {
+	images=(`echo "$@"`)
+	for image in ${images[*]}
+	do
+		valid=`is_valid_url $image`
+		if [[ $valid == "0" ]]
+		then
+			echo $image
+			break
+		fi
+	done
 }
 
 function extract_url_id {

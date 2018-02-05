@@ -49,12 +49,18 @@ done
 urls=( )
 for line in $ori_lines
 do
-	cat tmp2.html | tail -n +$line | head -n 1 | gawk 'BEGIN{RS="\""} /https?:[0-9picFu\/\\]*.zhimg.com/{print $0}' | head -n 1 > tmp_line
+	#cat tmp2.html | tail -n +$line | head -n 1 | gawk 'BEGIN{RS="\""} /https?:[0-9picFu\/\\]*.zhimg.com/{print $0}' | head -n 1 > tmp_line
+	cat tmp2.html | tail -n +$line | head -n 1 | gawk 'BEGIN{RS="\""} /https?:[0-9picFu\/\\]*.zhimg.com/{print $0}' > tmp_lines
+	images=`cat tmp_lines`
+	image=`find_big_image ${images[*]}`
+	find_big_image ${images[*]} > tmp_line
 	index=${#urls[@]}
 	url=`cat tmp_line`
 	urls[ $index ]=$url
-	rm -f tmp_line
 done
+
+rm -f tmp_line
+rm -f tmp_lines
 
 # replace http-urls using line numbers
 index=$[ 0 ]
