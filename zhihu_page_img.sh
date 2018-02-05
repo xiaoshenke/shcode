@@ -1,6 +1,20 @@
 #!/bin/bash
 # test URL:https://zhuanlan.zhihu.com/p/33344222?utm_campaign=rss&utm_medium=rss&utm_source=rss&utm_content=title
 
+# init save_image flag 0:not save 1:save
+save_image=0
+while [ -n "$1" ]
+do
+	case "$1" in
+	-s | -save_image) 
+		save_image=1 ;;
+	*) 
+		break;;
+	esac
+	shift
+done 
+
+
 # check params
 if [ $# -ne 1 ] 
 then
@@ -52,6 +66,31 @@ do
 	# sed 'c\' -> replace command
 	sed "$line c\\
 $url
+" tmp2.html > tmp3.html
+	cat tmp3.html > tmp2.html
+	index=$[index + 1]
+done
+
+if [ $save_image -ne 1 ]
+then
+	cat tmp2.html
+	exit 2
+fi
+
+jpg_list=`list_images`
+jpg_size=${#jpg_list[@]}
+jpg_index=$[ jpg_size + 1 ]
+
+index=$[ 0 ]
+lenth=${#urls[@]}
+while [ $index -lt $lenth ]
+do
+	line=${lines[ $index ]}
+	url=${urls[ $index ]}
+	save_name=$[ jpg_index + $index ].jpg
+	curl -s -o $save_name  $url > /dev/null 2>&1
+	sed "$line c\\
+$save_name
 " tmp2.html > tmp3.html
 	cat tmp3.html > tmp2.html
 	index=$[index + 1]

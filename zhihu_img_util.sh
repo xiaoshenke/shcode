@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# currently only support .jpg
+function list_images {
+	local dir=""
+	if [ -n "$1" ]
+	then
+		dir=$1
+	else
+		dir=`dirname "$0"`
+		dir=`cd "$dir";pwd`
+	fi
+	list=`find $dir -name *[.]jpg`
+	echo ${list[@]}
+}
+
 function extract_url_id {
 	url=$1
 	url=${url##*com/}
