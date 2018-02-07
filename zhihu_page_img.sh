@@ -79,13 +79,17 @@ done
 
 if [ $save_image -ne 1 ]
 then
-	cat tmp2.html
+	cat tmp2.html|sed '='
+	rm -f tmp.html
+	rm -f tmp1.html
+	rm -f tmp2.html
+	rm -f tmp3.html
 	exit 2
 fi
 
 jpg_list=`list_images`
 jpg_size=${#jpg_list[@]}
-jpg_index=$[ jpg_size + 1 ]
+jpg_index=$[ jpg_size ]
 
 index=$[ 0 ]
 lenth=${#urls[@]}
@@ -102,7 +106,7 @@ $save_name
 	index=$[index + 1]
 done
 
-cat tmp2.html
+cat tmp2.html | sed '='
 
 rm -f tmp3.html
 rm -f tmp.html
