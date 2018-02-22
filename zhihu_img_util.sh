@@ -60,6 +60,21 @@ function should_download {
 	fi
 }
 
+function is_zhihu_page_url {
+	if [ $# -ne 1 ]
+	then
+		echo 1
+	fi
+	ZHIHU_PAGE_URL_PATTERN="^https:[/][/]zhuanlan[.]zhihu[.]com[/]p[/][0-9]+[?]?"
+	url=$1
+	if [[ $1 =~ $ZHIHU_PAGE_URL_PATTERN  ]]
+	then 
+		echo 0
+	else
+		echo 1
+	fi
+}
+
 
 # 0:success 1:false those url which ends with "_r.jpg" is valid
 function is_valid_url {
@@ -107,4 +122,3 @@ function return_valid_urls {
 	echo ${images[@]}
 }
 
-abc="abcdefg"

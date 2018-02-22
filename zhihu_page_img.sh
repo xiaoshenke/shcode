@@ -24,6 +24,13 @@ fi
 
 . zhihu_img_util.sh 
 
+is_zhihu_page_url=`is_zhihu_page_url $1`
+if [[ $is_zhihu_page_url == "1" ]]
+then
+	echo not a valid zhihu_page url,please check your url
+	exit 2
+fi
+
 curl -s -o tmp.html $1 > /dev/null
 
 # find useful content positions,we will only extract content in [start,end]
@@ -79,7 +86,8 @@ done
 
 if [ $save_image -ne 1 ]
 then
-	cat tmp2.html|sed '='
+	cat tmp2.html
+#|sed '='
 	rm -f tmp.html
 	rm -f tmp1.html
 	rm -f tmp2.html
@@ -106,7 +114,8 @@ $save_name
 	index=$[index + 1]
 done
 
-cat tmp2.html | sed '='
+cat tmp2.html 
+#| sed '='
 
 rm -f tmp3.html
 rm -f tmp.html
