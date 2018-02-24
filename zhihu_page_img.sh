@@ -122,9 +122,3 @@ rm -f tmp.html
 rm -f tmp1.html
 rm -f tmp2.html
 
-
-# extract html urls
-#cat tmp2.html | gawk '/img src/{print $0}'| gawk 'BEGIN{RS="\""} /https?:[0-9picFu\/\\]*.zhimg.com/{print $0}' > tmp_urls
-#urls=`cat tmp_urls`
-#clean_urls=`return_valid_urls ${urls[*]}`
-#echo ${clean_urls[*]}

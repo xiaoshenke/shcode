@@ -75,6 +75,22 @@ function is_zhihu_page_url {
 	fi
 }
 
+function is_zhihu_answer_url {
+	if [ $# -ne 1 ]
+	then
+		echo 1
+	fi
+	ZHIHU_ANSWER_URL_PATTERN="^https:[/][/]www[.]zhihu[.]com[/]question[/][0-9]+[/]answer[/][0-9]+"
+	url=$1
+	if [[ $1 =~ $ZHIHU_ANSWER_URL_PATTERN  ]]
+	then 
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+
 
 # 0:success 1:false those url which ends with "_r.jpg" is valid
 function is_valid_url {
