@@ -90,6 +90,21 @@ function is_zhihu_answer_url {
 	fi
 }
 
+function is_zhihu_user_posts_url {
+	if [ $# -ne 1 ]
+	then
+		echo 1
+	fi
+	ZHIHU_USER_POSTS_PATTERN="https:[/][/]www.zhihu.com[/]people[/][A-Za-z0-9]+[/]posts"
+	url=$1
+	if [[ $1 =~ $ZHIHU_USER_POSTS_PATTERN  ]]
+	then 
+		echo 0
+	else
+		echo 1
+	fi
+}
+
 
 
 # 0:success 1:false those url which ends with "_r.jpg" is valid
