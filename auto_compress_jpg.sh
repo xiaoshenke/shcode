@@ -3,10 +3,8 @@
 # a ulity which auto compress jpgs under $BASE_DIR in every 5 seconds..
 # Usage: ./auto_compress_jpg.sh &
 
-BASE_DIR="/Users/wuxian/Desktop"
-
+BASE_DIR="/Users/dashu/Desktop"
 BASE_DIR_LEN=${#BASE_DIR}
-echo BASE_DIR_LEN:$BASE_DIR_LEN
 
 cvt=`type convert`
 not_found="not found"
@@ -17,26 +15,33 @@ then
 	exit 2
 fi
 
-function convert_image {
-	files=`find $BASE_DIR -maxdepth 1 -size +200k`
-	for f in $files:
-	do
-		fname=${f:$[ BASE_DIR_LEN + 1 ]}
-		if [[ $fname =~ ".jpg" ]]
+function do_if_convert {
+	f=(`echo "$@"`)
+	if [[ ${f[*]} =~ ".png" ]]
+	then
+		if [[ ${f[*]} =~ "_c.png" ]]
 		then
-			# if end with _c.jpg,means we have already compressed it 
-			if [[ $fname =~ "_c.jpg" ]]
-			then 
-				continue
-			fi
-			fnew_name=${f/%.jpg/_c.jpg}
-			echo convert -resize 80%x80% $f $fnew_name
-
-			# TODO: quality not good enough..
-			convert -resize 80%x80% $f $fnew_name
-			rf -f $f
+			# already exists,just confinue
+			continue
 		fi
-	done
+		size="$(wc -c < "${f[*]}")"
+		# only those bigger than 200k pngs will be compressed
+		if [ $size -gt 204800 ]
+		then 
+			fnew_name=${f[*]/%.png/_c.png}
+			echo convert -resize 80%x80% ${f[*]} ${fnew_name[*]}
+			convert -resize 80%x80% "${f[*]}" "${fnew_name[*]}"
+			#rm -f $f
+		fi
+	fi
+}
+
+function convert_image {
+	# actually,using find is ok also
+	#files=`find $BASE_DIR -maxdepth 1 -size +200k`
+	ls -1 $BASE_DIR | while read word;do
+do_if_convert ${word[*]}
+done
 }
 
 while true
