@@ -48,35 +48,19 @@ function get_news_list_in_activity {
 	start=`cat $watch_file | sed -n '/activity_begin/=' `
 	end=`cat $watch_file | sed -n '/activity_end/=' `
 	duration=$[end-start+1]
+
 	cat $watch_file |tail -n +$start|head -n $duration > tmp
+	cat tmp |grep "^$username:"  | gawk 'BEGIN{FS=":"} {print $2}' > list.html
 
-	# FIXME: not working...
-	#cat $tmp  | gawk -v user="$username" 'BEGIN{FS=":"} /$user:/{print $2}' > list.html
-
-	len=${#username}
-	len=$[len+1]
-	a=`cat tmp`
+	a=`cat list.html`
 	rm -f tmp
-	success=0
-	for line in $a
-	do
-		if [[ ${line:0:$len} == $username: ]]
-		then
-			success=1
-			a=${line:$len}
-			OLD_IFS="$IFS"
-			IFS=","
-			users=($a)
-			IFS="$OLD_IFS"
-			echo ${users[@]}
-		fi
-	done
-	if [ $success -eq 0 ]
-	then
-		users=()
-		echo  ${users[@]}
-	fi
+	rm -f list.html
 
+	OLD_IFS="$IFS"
+	IFS=","
+	users=($a)
+	IFS="$OLD_IFS"
+	echo ${users[@]}
 }
 
 # TODO
