@@ -1,8 +1,82 @@
 #!/bin/bash
 
-# TODO
+# FIXME:has some bug working with brackets
 function get_activity_users {
-	echo "zhangsan"
+	watch_file=$1
+	cat $watch_file  | gawk 'BEGIN{FS=":"} /activity:/{print $2}' > tmp
+	#cat tmp | gawk 'BEGIN{RS=","} {print $0}' > tmp2
+	a=`cat tmp`
+	rm -f tmp
+
+	OLD_IFS="$IFS"
+	IFS=","
+	users=($a)
+	IFS="$OLD_IFS"
+	echo ${users[@]}
+}
+
+# 0:false 1:true
+function contains_user_in_activity {
+	user=$1
+	watch_file=$2
+	users=`get_activity_users $watch_file`
+	success=0
+	for u in $users
+	do
+		if [[ $user == $u ]]
+		then
+			success=1
+			echo 1
+		fi
+	done
+	if [ $success -eq 0 ]
+	then
+		echo 0
+	fi
+}
+
+# TODO
+function update_news_list_in_activity {
+	echo 0
+}
+
+# param 1:username 2:watchfile
+function get_news_list_in_activity {
+	username=$1
+	watch_file=$2
+
+	start=`cat $watch_file | sed -n '/activity_begin/=' `
+	end=`cat $watch_file | sed -n '/activity_end/=' `
+	duration=$[end-start+1]
+	cat $watch_file |tail -n +$start|head -n $duration > tmp
+
+	# FIXME: not working...
+	#cat $tmp  | gawk -v user="$username" 'BEGIN{FS=":"} /$user:/{print $2}' > list.html
+
+	len=${#username}
+	len=$[len+1]
+	a=`cat tmp`
+	rm -f tmp
+	success=0
+	for line in $a
+	do
+		if [[ ${line:0:$len} == $username: ]]
+		then
+			success=1
+			a=${line:$len}
+			OLD_IFS="$IFS"
+			IFS=","
+			users=($a)
+			IFS="$OLD_IFS"
+			echo ${users[@]}
+		fi
+	done
+	if [ $success -eq 0 ]
+	then
+		users=()
+		echo  ${users[@]}
+	fi
+
 }
 
 # TODO
