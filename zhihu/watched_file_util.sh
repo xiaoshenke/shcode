@@ -35,9 +35,43 @@ function contains_user_in_activity {
 	fi
 }
 
-# TODO
+# param 1:watchfile 2:username 3:newslist
+# return 0:fail 1:success
 function update_news_list_in_activity {
-	echo 0
+	if [ $# -le 2 ]
+	then
+		echo 0
+	else
+		watch_file=$1
+		shift
+		username=$1
+		shift
+ 		new_list=(`echo "$@"`)
+
+		# check insert or update
+		start=`cat $watch_file | sed -n '/activity_begin/=' `
+		end=`cat $watch_file | sed -n '/activity_end/=' `
+		line=`sed -n ''$start','$end'p' $watch_file | grep "^$username:" | wc -l`
+		if [ $line -eq 0 ]
+		then
+			# do insert
+sed "$start a\\
+$username:$new_list
+" $watch_file > tmp
+			cat tmp > $watch_file
+			rm -f tmp
+		else	
+			# do update
+			lindex=`sed -n ''$start','$end'p' $watch_file | sed -n '/'$username':/='`
+			lindex=$[lindex+start-1]
+			sed "$lindex c\\
+$username:$new_list
+" $watch_file > tmp
+			cat tmp > $watch_file
+			rm -f tmp
+		fi	
+		echo 1
+	fi
 }
 
 # param 1:username 2:watchfile
