@@ -26,7 +26,7 @@ duration=$[end-start+1]
 
 # extract text and <image src="http://xxxx"> from origin html file
 cat tmp.html |tail -n +$start | gawk 'BEGIN{RS="abcdefgfedcba";FS="<\/main>"} {print $1}' > tmp1.html
-cat tmp1.html| gawk 'BEGIN{RS="<p>|</p>|<figcaption>|</title>|<b>|<code class=\"language-text\">"} {print $0}' | sed '/img data-rawheight/!s/<[^>]*>//g' > tmp2.html
+cat tmp1.html| gawk 'BEGIN{RS="</div></div></div>|<p>|</p>|</a>|<br>|<figcaption>|</title>|<b>|<code class=\"language-text\">"} {print $0}' | sed '/img data-rawheight/!s/<[^>]*>//g' > tmp2.html
 
 cat tmp2.html
 
