@@ -34,14 +34,20 @@ fi
 curl -s -o tmp.html $1 > /dev/null
 
 # find useful content positions,we will only extract content in [start,end]
-start=`sed -n '/PostIndex-title/=' tmp.html`
-end=`sed -n '/PostIndex-footer/=' tmp.html`
+start=`sed -n '/Post-NormalMain/=' tmp.html`
+end=`sed -n '/Zi--Comment/=' tmp.html`
 duration=$[end-start+1]
 
 # extract text and <image src="http://xxxx"> from origin html file
 cat tmp.html |tail -n +$start|head -n $duration | gawk 'BEGIN{RS="abcdefgfedcba";FS="<div class=\"PostIndex-footer"} {print $1}' > tmp1.html
-cat tmp1.html| gawk 'BEGIN{RS="<p>|</p>|</title>|<b>|<code class=\"language-text\">"} {print $0}' | sed '/img src/!s/<[^>]*>//g' > tmp2.html
+cat tmp1.html| gawk 'BEGIN{RS="<figure>|</figure>|<p>|</p>|</title>|<b>|<code class=\"language-text\">"} {print $0}' | sed '/img src/!s/<[^>]*>//g' > tmp2.html
 
+# fix not able to delete meaningless down messages
+start=[ 1 ]
+end=`sed -n '/Zi--Comment/=' tmp2.html`
+duration=$[end-start]
+cat tmp2.html | tail -n +$start|head -n $duration > tmp1.html
+cat tmp1.html > tmp2.html
 
 # find line numbers of all image positions,we will replace urls using these line numbers
 ori_lines=`cat tmp2.html |sed -n '/img src/='`
