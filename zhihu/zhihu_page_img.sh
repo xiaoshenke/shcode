@@ -92,7 +92,8 @@ done
 
 if [ $save_image -ne 1 ]
 then
-	cat tmp2.html
+	last=""
+	cat tmp2.html | ./rm_blank_lines.sh
 #|sed '='
 	rm -f tmp.html
 	rm -f tmp1.html
@@ -120,7 +121,7 @@ $save_name
 	index=$[index + 1]
 done
 
-cat tmp2.html 
+cat tmp2.html | ./rm_blank_lines.sh 
 #| sed '='
 
 rm -f tmp3.html
