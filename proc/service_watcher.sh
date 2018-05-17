@@ -8,11 +8,11 @@ echo service watcher started!
 while true
 do
 	service_started=`is_service_alive`
-	echo service_started:$service_started
+	#echo service_started:$service_started
 
 	if [[ $service_started == "0" ]]
 	then
-		echo service not started,restart it now!
+		echo service not started,restart it now! `date +'%Y-%m-%d %H:%M:%S'`
 		/bin/bash restart.sh
 	fi
 	sleep 5
