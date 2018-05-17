@@ -13,7 +13,7 @@ do
 	if [[ $service_started == "0" ]]
 	then
 		echo service not started,restart it now!
-		sh restart.sh
+		/bin/bash restart.sh
 	fi
 	sleep 5
 done
