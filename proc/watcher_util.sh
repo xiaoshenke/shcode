@@ -10,7 +10,7 @@ function is_watcher_started {
 	fi
 	
 	proc_id=$1
-        PIDS=`ps aux|grep service_watcher|grep bin|grep $proc_id|awk '{print $2}'`
+        PIDS=`ps aux|grep watcher|grep bin|grep $proc_id|awk '{print $2}'`
 
 	if [[ ${PIDS[*]} != "" ]]
 	then
@@ -32,7 +32,7 @@ function stop_watcher {
 	watcher_startd=`is_watcher_started $proc_id`
 	if [[ $watcher_startd == "1" ]]
 	then
-		PIDS=`ps aux|grep service_watcher|grep bin|grep $proc_id|awk '{print $2}'`
+		PIDS=`ps aux|grep watcher|grep bin|grep $proc_id|awk '{print $2}'`
 		for PID in $PIDS
 		do
 			kill $PID > /dev/null 2>&1
@@ -61,7 +61,7 @@ function start_watcher {
 		then
 			/bin/bash watcher.sh $proc_id 2>&1 &
 		else
-			/bin/bash watcher.sh $proc_id >"watcher.log" 2>&1 &
+			/bin/bash watcher.sh $proc_id >>"watcher.log" 2>&1 &
 		fi
 	else
 		echo watcher already started!

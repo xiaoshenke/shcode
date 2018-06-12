@@ -28,6 +28,8 @@ then
 	echo service started,but service not alive,is there some bug in your code in the first place ?
 	echo goodbye...
 	exit 2
+else
+	echo watcher of pid:$proc_id success started!
 fi
 
 while true
@@ -37,7 +39,7 @@ do
 	then
 		echo service not started,restart it now! `date +'%Y-%m-%d %H:%M:%S'`
 		/bin/bash restart.sh
-		echo goodbye....
+		echo watcher of pid:$proc_id is shutted down!
 		exit 2
 	fi
 	sleep 5
