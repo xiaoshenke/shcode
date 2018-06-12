@@ -1,10 +1,9 @@
 #!/bin/bash
-test=0
+# service utilitys,when you use it in PRODUCTION,you must custom @is_service_alive,@is_service_started,@get_service_pid
 
-# make sure SERVICE_PORT is always the right one!
-SERVICE_PORT=8086
-# Pre defined http url to check if service is alive 1:alive 0:dead
+test=0
 function is_service_alive {
+	SERVICE_PORT=8086
 	i=`curl -s http://127.0.0.1:$SERVICE_PORT/am_i_alive`
 	if [[ $i == "1" ]]
 	then
@@ -14,74 +13,44 @@ function is_service_alive {
 	fi
 }
 
-
-# 1:started 0:not started yet!
-function is_watcher_started {
-	if [ $# -ne 1 ]
-	then
-		echo Usage:is_watcher_started proc-id
-		return 0
-	fi
-	
-	proc_id=$1
-        PIDS=`ps aux|grep service_watcher|grep bin|grep $proc_id|awk '{print $2}'`
-
+function is_service_started {
+	PIDS=`netstat -apn | grep ':8086' | awk '/tcp/{print $NF}'`
+	PIDS=${PIDS[*]%%/*}
 	if [[ ${PIDS[*]} != "" ]]
 	then
 		echo 1
 	else
 		echo 0
-	fi
-}
-
-function stop_watcher {
-	if [ $# -ne 1 ]
-	then
-		echo Usage:stop_watcher proc-id
-		return 0
 	fi	
-	proc_id=$1
-	echo trying to stop watcher of pid:$proc_id...
-
-	watcher_startd=`is_watcher_started $proc_id`
-	if [[ $watcher_startd == "1" ]]
-	then
-		PIDS=`ps aux|grep service_watcher|grep bin|grep $proc_id|awk '{print $2}'`
-		for PID in $PIDS
-		do
-			kill $PID > /dev/null 2>&1
-		done
-		echo watcher of pid:$proc_id stoped!
-	else
-		echo watcher of pid:$proc_id not started!
-	fi
 }
 
+function get_service_pid {
+	PIDS=`netstat -apn | grep ':8086' | awk '/tcp/{print $NF}'`
+	PIDS=${PIDS[*]%%/*}
+	for pid in $PIDS
+	do
+		echo $pid
+		break
+	done
 
-# check if need to start service watcher of proc-id
-function start_watcher {
-	if [ $# -ne 1 ]
-	then
-		echo Usage:start_watcher proc-id
-		return 0
-	fi
-	proc_id=$1
+	if [ $test -eq 1 ]
+        then
+                echo 123
+        fi
+}
 
-	watcher_started=`is_watcher_started $proc_id`
-	if [[ $watcher_started == "0" ]]
-	then
-		echo watcher of pid:$proc_id not started,start it now..... 
-		if [ $test -eq 1 ]
+function get_service_pid_till_success {
+	pid=`get_service_pid`
+	while true
+	do
+		if [ "$pid" -gt 0  ] 2>/dev/null;
 		then
-			/bin/bash service_watcher.sh $proc_id 2>&1 &
+			break
 		else
-			/bin/bash service_watcher.sh $proc_id >"watcher.log" 2>&1 &
+			sleep 1
+			pid=`get_service_pid`
+			#echo service pid:$pid
 		fi
-		echo watcher success started!
-	else
-		echo watcher already started!
-	fi
+	done
+	echo $pid
 }
-
-
-

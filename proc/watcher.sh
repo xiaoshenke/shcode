@@ -21,6 +21,15 @@ then
 fi
 
 . service_util.sh
+service_started=`is_service_started`
+service_alive=`is_service_alive`
+if [[ $service_started == "1" ]] && [[ $service_alive != "1" ]]
+then
+	echo service started,but service not alive,is there some bug in your code in the first place ?
+	echo goodbye...
+	exit 2
+fi
+
 while true
 do
 	service_started=`is_service_alive`
@@ -28,8 +37,8 @@ do
 	then
 		echo service not started,restart it now! `date +'%Y-%m-%d %H:%M:%S'`
 		/bin/bash restart.sh
+		echo goodbye....
+		exit 2
 	fi
 	sleep 5
 done
-
-
