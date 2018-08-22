@@ -3,7 +3,8 @@
 # check listen port here!
 PIDS=`netstat -apn | grep 8086 | awk '/tcp/{print $NF}'`
 
-PIDS=${PIDS[*]///python/}
+#PIDS=${PIDS[*]///python/}
+PIDS=${PIDS[*]%%/*}
 
 if [ -z "$PIDS" ]; then
 	echo "server does not started!"
